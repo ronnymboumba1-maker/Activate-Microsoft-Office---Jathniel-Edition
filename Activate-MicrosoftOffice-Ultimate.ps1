@@ -1,5 +1,5 @@
 # ============================================================
-# ACTIVATE MICROSOFT OFFICE ULTIMATE - JATHNIEL EDITION
+# J4 ACTIVATOR - JATHNIEL EDITION
 # Version 3.0.0 - Auto-installation des dépendances
 # ============================================================
 
@@ -55,7 +55,7 @@ function Install-Dependencies {
 
 # ==================== FONCTIONS PRINCIPALES ====================
 
-function Activate-MicrosoftOffice-Ultimate {
+function J4-Activator {
     <#
     .SYNOPSIS
     Activate Microsoft Office 2016-2024 + Windows + Visio + Project
@@ -128,7 +128,7 @@ function Activate-MicrosoftOffice-Ultimate {
 
     # ==================== VÉRIFICATION PRIVILÈGES ====================
 
-    if ($Help) { return (Get-Help Activate-MicrosoftOffice-Ultimate) }
+    if ($Help) { return (Get-Help J4-Activator) }
 
     $User    = [Security.Principal.WindowsIdentity]::GetCurrent();
     $isAdmin = (New-Object Security.Principal.WindowsPrincipal $User).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
@@ -633,14 +633,14 @@ function Show-OfficeVersionMenu {
     Write-Host @"
 ╔══════════════════════════════════════════════════════════════════════╗
 ║                                                                      ║
-║   ██████╗  ███████╗██╗██╗     ████████╗██╗    ██╗██╗███╗   ██╗    ║
-║   ██╔══██╗██╔════╝██║██║     ╚══██╔══╝██║    ██║██║████╗  ██║    ║
-║   ██████╔╝█████╗  ██║██║        ██║   ██║ █╗ ██║██║██╔██╗ ██║    ║
-║   ██╔══██╗██╔══╝  ██║██║        ██║   ██║███╗██║██║██║╚██╗██║    ║
-║   ██║  ██║███████╗██║███████╗   ██║   ╚███╔███╔╝██║██║ ╚████║    ║
-║   ╚═╝  ╚═╝╚══════╝╚═╝╚══════╝   ╚═╝    ╚══╝╚══╝ ╚═╝╚═╝  ╚═══╝    ║
+║   ██╗  ██╗    █████╗  ██████╗████████╗██╗██╗   ██╗ █████╗ ████████╗║
+║   ██║  ██║   ██╔══██╗██╔════╝╚══██╔══╝██║██║   ██║██╔══██╗╚══██╔══╝║
+║   ███████║   ███████║██║        ██║   ██║██║   ██║███████║   ██║   ║
+║   ╚════██║   ██╔══██║██║        ██║   ██║╚██╗ ██╔╝██╔══██║   ██║   ║
+║        ██║   ██║  ██║╚██████╗   ██║   ██║ ╚████╔╝ ██║  ██║   ██║   ║
+║        ╚═╝   ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝  ╚═══╝  ╚═╝  ╚═╝   ╚═╝   ║
 ║                                                                      ║
-║              ACTIVATE MICROSOFT OFFICE ULTIMATE                     ║
+║              J4 ACTIVATOR - ULTIMATE EDITION                        ║
 ║              JATHNIEL EDITION - v3.0                                ║
 ║                                                                      ║
 ╚══════════════════════════════════════════════════════════════════════╝
@@ -817,7 +817,7 @@ function Show-OfficeVersionMenu {
         $VersionIndex++
     }
     
-    $Command = "Activate-MicrosoftOffice-Ultimate"
+    $Command = "J4-Activator"
     
     if ($VersionChoice -eq 'A') {
         Write-Host ""
@@ -1045,14 +1045,14 @@ function Show-MainMenu {
     Write-Host @"
 ╔══════════════════════════════════════════════════════════════════════╗
 ║                                                                      ║
-║   ██████╗  ███████╗██╗██╗     ████████╗██╗    ██╗██╗███╗   ██╗    ║
-║   ██╔══██╗██╔════╝██║██║     ╚══██╔══╝██║    ██║██║████╗  ██║    ║
-║   ██████╔╝█████╗  ██║██║        ██║   ██║ █╗ ██║██║██╔██╗ ██║    ║
-║   ██╔══██╗██╔══╝  ██║██║        ██║   ██║███╗██║██║██║╚██╗██║    ║
-║   ██║  ██║███████╗██║███████╗   ██║   ╚███╔███╔╝██║██║ ╚████║    ║
-║   ╚═╝  ╚═╝╚══════╝╚═╝╚══════╝   ╚═╝    ╚══╝╚══╝ ╚═╝╚═╝  ╚═══╝    ║
+║   ██╗  ██╗    █████╗  ██████╗████████╗██╗██╗   ██╗ █████╗ ████████╗║
+║   ██║  ██║   ██╔══██╗██╔════╝╚══██╔══╝██║██║   ██║██╔══██╗╚══██╔══╝║
+║   ███████║   ███████║██║        ██║   ██║██║   ██║███████║   ██║   ║
+║   ╚════██║   ██╔══██║██║        ██║   ██║╚██╗ ██╔╝██╔══██║   ██║   ║
+║        ██║   ██║  ██║╚██████╗   ██║   ██║ ╚████╔╝ ██║  ██║   ██║   ║
+║        ╚═╝   ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝  ╚═══╝  ╚═╝  ╚═╝   ╚═╝   ║
 ║                                                                      ║
-║              ACTIVATE MICROSOFT OFFICE ULTIMATE                     ║
+║              J4 ACTIVATOR - ULTIMATE EDITION                        ║
 ║              JATHNIEL EDITION - v3.0                                ║
 ║                                                                      ║
 ╚══════════════════════════════════════════════════════════════════════╝
@@ -1104,7 +1104,7 @@ $GLOBAL:KMS_Server = $null
 
 # Afficher un message de bienvenue
 Clear-Host
-Write-Host "⚡ Activate Microsoft Office Ultimate - JATHNIEL EDITION" -ForegroundColor Cyan
+Write-Host "⚡ J4 ACTIVATOR - JATHNIEL EDITION" -ForegroundColor Cyan
 Write-Host "📦 Version 3.0.0" -ForegroundColor Yellow
 Write-Host ""
 
