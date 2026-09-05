@@ -137,15 +137,13 @@ function J4-Activator {
         return 
     }
 
-    # ==================== SERVEURS KMS ÉTENDUS ====================
+    # ==================== SERVEURS KMS ====================
     
     $KMS_Servers = @(
-        # Serveurs principaux
         'e8.us.to',
         'e9.us.to',
         'kms8.msguides.com',
         'kms9.msguides.com',
-        # Serveurs secondaires
         'kms.digiboy.ir',
         'kms.lotro.cc',
         'kms.w10.host',
@@ -159,14 +157,14 @@ function J4-Activator {
         'kms.kmspi.com'
     )
 
-    # ==================== CLÉS PRODUITS ÉTENDUS ====================
+    # ==================== CLÉS ====================
     
     # Clés Office
-    $KeyTable = @(
-        [PSCustomObject]@{ OfficeName="Microsoft Office 2024" ; OfficeVersion="ProPlus2024" ; Key="XJ2XN-FW8RK-P4HMP-DKDBV-GCVGB" },
-        [PSCustomObject]@{ OfficeName="Microsoft Office 2021" ; OfficeVersion="ProPlus2021" ; Key="FXYTK-NJJ8C-GB6DW-3DYQT-6F7TH" },
-        [PSCustomObject]@{ OfficeName="Microsoft Office 2019" ; OfficeVersion="ProPlus2019" ; Key="NMMKJ-6RK4F-KMJVX-8D9MJ-6MWKP" },
-        [PSCustomObject]@{ OfficeName="Microsoft Office 2016" ; OfficeVersion="ProPlus"     ; Key="XQNVK-8JYDB-WJ9W3-YJ8YR-WFG99" }
+    $OfficeKeys = @(
+        [PSCustomObject]@{ Name="Microsoft Office 2024" ; Version="ProPlus2024" ; Key="XJ2XN-FW8RK-P4HMP-DKDBV-GCVGB" },
+        [PSCustomObject]@{ Name="Microsoft Office 2021" ; Version="ProPlus2021" ; Key="FXYTK-NJJ8C-GB6DW-3DYQT-6F7TH" },
+        [PSCustomObject]@{ Name="Microsoft Office 2019" ; Version="ProPlus2019" ; Key="NMMKJ-6RK4F-KMJVX-8D9MJ-6MWKP" },
+        [PSCustomObject]@{ Name="Microsoft Office 2016" ; Version="ProPlus"     ; Key="XQNVK-8JYDB-WJ9W3-YJ8YR-WFG99" }
     )
     
     # Clés Windows
@@ -281,8 +279,8 @@ function J4-Activator {
 
     function Get-OfficeKey {
         param([string]$Version)
-        foreach ($Key in $KeyTable) {
-            if ($Version -eq $Key.OfficeVersion) {
+        foreach ($Key in $OfficeKeys) {
+            if ($Version -eq $Key.Version) {
                 return $Key
             }
         }
@@ -434,7 +432,7 @@ function J4-Activator {
         }
     }
 
-    # ==================== ROLLBACK OFFICE ====================
+    # ==================== ROLLBACK ====================
     
     function Rollback-OfficeVersion {
         Write-Log "[+] Rollback de la version Office..." -Color "Yellow"
@@ -489,8 +487,8 @@ function J4-Activator {
 
     # ==================== TRAITEMENT PRINCIPAL ====================
 
-    ## Step 1: Vérifier Office
-    Write-Log '[+] Détermination de l'architecture Office...' -Color "Yellow"
+    # Vérifier Office
+    Write-Log '[+] Détermination de l\'architecture Office...' -Color "Yellow"
     $PreActivate = "$PWD"
     $OfficeDir = "${env:ProgramFiles}\Microsoft Office\Office16"
     $OfficeDirx86 = "${env:ProgramFiles(x86)}\Microsoft Office\Office16"
@@ -507,7 +505,7 @@ function J4-Activator {
         return 
     }
 
-    ## Step 2: Déterminer la version Office
+    # Déterminer la version Office
     Write-Log "[+] Détermination de la version Office..." -Color "Yellow"
     $OfficeVersion = Get-OfficeVersion
     
@@ -522,16 +520,16 @@ function J4-Activator {
         }
     }
 
-    ## Step 3: Trouver la clé Office
+    # Trouver la clé Office
     $OfficeKey = Get-OfficeKey -Version $OfficeVersion
     if (!$OfficeKey) {
         Write-Log "[!] Clé non trouvée pour la version $OfficeVersion" -Color "Red"
         Set-Location -LiteralPath $PreActivate
         return
     }
-    Write-Log "   Produit: $($OfficeKey.OfficeName)" -Color "Cyan"
+    Write-Log "   Produit: $($OfficeKey.Name)" -Color "Cyan"
 
-    ## Step 4: Trouver un serveur KMS
+    # Trouver un serveur KMS
     if ($KMSserver) {
         Write-Log "[+] Utilisation du serveur KMS spécifié: $KMSserver" -Color "Yellow"
         $KMS_Server = $KMSserver
@@ -544,10 +542,10 @@ function J4-Activator {
         }
     }
 
-    ## Step 5: Désactiver la télémétrie
+    # Désactiver la télémétrie
     Disable-Telemetry
 
-    ## Step 6: Convertir la licence
+    # Convertir la licence
     Write-Log "[+] Conversion des licences Retail en Volume..." -Color "Yellow"
     $Licenses = (Get-ChildItem "..\root\Licenses16\${OfficeVersion}VL_KMS*.xrm-ms" -ErrorAction SilentlyContinue).FullName
 
@@ -560,7 +558,7 @@ function J4-Activator {
         Write-Log "   ⚠️ Aucune licence Volume trouvée" -Color "Yellow"
     }
 
-    ## Step 7: Activer Office
+    # Activer Office
     Write-Log "`n[+] Activation de Microsoft Office..." -Color "Yellow"
 
     Write-Log "   🔹 Serveur KMS: $KMS_Server" -Color "Cyan"
@@ -577,10 +575,10 @@ function J4-Activator {
     Write-Log "   🔹 Installation de la clé KMS..." -Color "Cyan"
     $ActivationResult = Activate-Product -ProductName "Microsoft Office" -Key $OfficeKey.Key -KMS_Server $KMS_Server -KMS_Port $KMSport
 
-    ## Step 8: Vérifier l'activation
+    # Vérifier l'activation
     $OfficeActivated = Verify-Activation -Product "Office"
 
-    ## Step 9: Rollback et désactivation des mises à jour
+    # Rollback et désactivation des mises à jour
     if (!$DontRollback) {
         Rollback-OfficeVersion
         Disable-OfficeUpdates
@@ -588,22 +586,22 @@ function J4-Activator {
         Write-Log "[+] Rollback ignoré" -Color "Yellow"
     }
 
-    ## Step 10: Activer Windows si demandé
+    # Activer Windows si demandé
     if ($ActivateWindows) {
         Activate-WindowsProduct -KMS_Server $KMS_Server -KMS_Port $KMSport
     }
 
-    ## Step 11: Activer Visio si demandé
+    # Activer Visio si demandé
     if ($ActivateVisio) {
         Activate-VisioProduct -KMS_Server $KMS_Server -KMS_Port $KMSport
     }
 
-    ## Step 12: Activer Project si demandé
+    # Activer Project si demandé
     if ($ActivateProject) {
         Activate-ProjectProduct -KMS_Server $KMS_Server -KMS_Port $KMSport
     }
 
-    ## Step 13: Résumé final
+    # Résumé final
     Write-Log "`n========================================" -Color "Cyan"
     Write-Log "📊 RÉSUMÉ DE L'ACTIVATION" -Color "Cyan"
     Write-Log "========================================" -Color "Cyan"
@@ -625,9 +623,11 @@ function J4-Activator {
     Write-Log "`n[+] Terminé." -Color "Green"
 }
 
-# ==================== MENU INTERACTIF ====================
+# ==================== MENUS INTERACTIFS ====================
 
-function Show-OfficeVersionMenu {
+# ===== MENU PRINCIPAL =====
+
+function Show-MainMenu {
     Clear-Host
     
     Write-Host @"
@@ -647,232 +647,383 @@ function Show-OfficeVersionMenu {
 "@ -ForegroundColor Cyan
 
     Write-Host ""
-    Write-Host "📋 VERSIONS DETECTÉES:" -ForegroundColor Yellow
+    Write-Host "┌─────────────────────────────────────────────────────────────────────┐" -ForegroundColor Cyan
+    Write-Host "│  📌 MENU PRINCIPAL                                                  │" -ForegroundColor Cyan
+    Write-Host "├─────────────────────────────────────────────────────────────────────┤" -ForegroundColor Cyan
+    Write-Host "│                                                                      │"
+    Write-Host "│  [1] 🔥 Activer Office                                              │" -ForegroundColor White
+    Write-Host "│  [2] 🪟 Activer Windows                                             │" -ForegroundColor White
+    Write-Host "│  [3] 💎 Activer Visio                                               │" -ForegroundColor White
+    Write-Host "│  [4] 📊 Activer Project                                             │" -ForegroundColor White
+    Write-Host "│  [5] 🚀 Activer Tout (Office + Windows + Visio + Project)          │" -ForegroundColor Green
+    Write-Host "│  [6] 📡 Choisir un serveur KMS                                     │" -ForegroundColor White
+    Write-Host "│  [7] ⚙️ Paramètres avancés                                          │" -ForegroundColor White
+    Write-Host "│  [8] ℹ️ Informations système                                        │" -ForegroundColor White
+    Write-Host "│  [9] 🔧 Réparer Office                                              │" -ForegroundColor White
+    Write-Host "│  [0] ❌ Quitter                                                     │" -ForegroundColor White
+    Write-Host "│                                                                      │"
+    Write-Host "└─────────────────────────────────────────────────────────────────────┘" -ForegroundColor Cyan
     
-    # Détection des versions
+    Write-Host ""
+    $Choice = Read-Host "👉 Votre choix"
+    
+    switch ($Choice) {
+        '1' { Show-OfficeMenu }
+        '2' { Show-WindowsMenu }
+        '3' { Show-VisioMenu }
+        '4' { Show-ProjectMenu }
+        '5' { Show-AllMenu }
+        '6' { Show-KMSServerMenu }
+        '7' { Show-AdvancedSettings }
+        '8' { Show-SystemInfo }
+        '9' { Repair-Office }
+        '0' {
+            Clear-Host
+            Write-Host "👋 Au revoir!" -ForegroundColor Green
+            exit
+        }
+        default {
+            Write-Host "❌ Option invalide" -ForegroundColor Red
+            Start-Sleep -Seconds 1
+        }
+    }
+}
+
+# ===== SOUS-MENU 1 : OFFICE =====
+
+function Show-OfficeMenu {
+    Clear-Host
+    
+    Write-Host @"
+┌─────────────────────────────────────────────────────────────────────┐
+│  🔥 ACTIVATION OFFICE                                              │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  📋 VERSIONS DÉTECTÉES:                                             │
+│                                                                      │
+"@ -ForegroundColor Cyan
+
+    # Détection des versions Office
+    $OfficeDetected = @()
+    
     $Office2016Path = "${env:ProgramFiles}\Microsoft Office\Office16"
     $Office2016Pathx86 = "${env:ProgramFiles(x86)}\Microsoft Office\Office16"
     
     if (Test-Path $Office2016Path -or Test-Path $Office2016Pathx86) {
-        Write-Host "   ✅ Office 2016 : Installé" -ForegroundColor Green
+        $Status = "Non activé"
         try {
-            $Status = cscript /nologo "${env:ProgramFiles}\Microsoft Office\Office16\ospp.vbs" /dstatus 2>$null
-            $LicenseStatus = ($Status | Select-String -Pattern "LICENSE STATUS:").ToString().Split(':')[-1].Trim()
-            if ($LicenseStatus -eq "LICENSED") {
-                Write-Host "      🔑 Statut: ACTIVÉ ✅" -ForegroundColor Green
-            } else {
-                Write-Host "      🔑 Statut: Non activé" -ForegroundColor Yellow
-            }
-        } catch {
-            Write-Host "      🔑 Statut: Inconnu" -ForegroundColor Yellow
-        }
-    } else {
-        Write-Host "   ❌ Office 2016 : Non installé" -ForegroundColor Red
+            $StatusCheck = cscript /nologo "${env:ProgramFiles}\Microsoft Office\Office16\ospp.vbs" /dstatus 2>$null
+            $LicenseStatus = ($StatusCheck | Select-String -Pattern "LICENSE STATUS:").ToString().Split(':')[-1].Trim()
+            if ($LicenseStatus -eq "LICENSED") { $Status = "ACTIVÉ ✅" }
+        } catch {}
+        Write-Host "  1️⃣ Office 2016        🔑 Statut: $Status" -ForegroundColor $(if ($Status -eq "ACTIVÉ ✅") { "Green" } else { "Yellow" })
+        $OfficeDetected += "2016"
     }
     
     $Office2019Path = "${env:ProgramFiles}\Microsoft Office\Office19"
     $Office2019Pathx86 = "${env:ProgramFiles(x86)}\Microsoft Office\Office19"
     
     if (Test-Path $Office2019Path -or Test-Path $Office2019Pathx86) {
-        Write-Host "   ✅ Office 2019 : Installé" -ForegroundColor Green
+        $Status = "Non activé"
         try {
-            $Status = cscript /nologo "${env:ProgramFiles}\Microsoft Office\Office19\ospp.vbs" /dstatus 2>$null
-            $LicenseStatus = ($Status | Select-String -Pattern "LICENSE STATUS:").ToString().Split(':')[-1].Trim()
-            if ($LicenseStatus -eq "LICENSED") {
-                Write-Host "      🔑 Statut: ACTIVÉ ✅" -ForegroundColor Green
-            } else {
-                Write-Host "      🔑 Statut: Non activé" -ForegroundColor Yellow
-            }
-        } catch {
-            Write-Host "      🔑 Statut: Inconnu" -ForegroundColor Yellow
-        }
-    } else {
-        Write-Host "   ❌ Office 2019 : Non installé" -ForegroundColor Red
+            $StatusCheck = cscript /nologo "${env:ProgramFiles}\Microsoft Office\Office19\ospp.vbs" /dstatus 2>$null
+            $LicenseStatus = ($StatusCheck | Select-String -Pattern "LICENSE STATUS:").ToString().Split(':')[-1].Trim()
+            if ($LicenseStatus -eq "LICENSED") { $Status = "ACTIVÉ ✅" }
+        } catch {}
+        Write-Host "  2️⃣ Office 2019        🔑 Statut: $Status" -ForegroundColor $(if ($Status -eq "ACTIVÉ ✅") { "Green" } else { "Yellow" })
+        $OfficeDetected += "2019"
     }
     
     $Office2021Path = "${env:ProgramFiles}\Microsoft Office\Office21"
     $Office2021Pathx86 = "${env:ProgramFiles(x86)}\Microsoft Office\Office21"
     
     if (Test-Path $Office2021Path -or Test-Path $Office2021Pathx86) {
-        Write-Host "   ✅ Office 2021 : Installé" -ForegroundColor Green
+        $Status = "Non activé"
         try {
-            $Status = cscript /nologo "${env:ProgramFiles}\Microsoft Office\Office21\ospp.vbs" /dstatus 2>$null
-            $LicenseStatus = ($Status | Select-String -Pattern "LICENSE STATUS:").ToString().Split(':')[-1].Trim()
-            if ($LicenseStatus -eq "LICENSED") {
-                Write-Host "      🔑 Statut: ACTIVÉ ✅" -ForegroundColor Green
-            } else {
-                Write-Host "      🔑 Statut: Non activé" -ForegroundColor Yellow
-            }
-        } catch {
-            Write-Host "      🔑 Statut: Inconnu" -ForegroundColor Yellow
-        }
-    } else {
-        Write-Host "   ❌ Office 2021 : Non installé" -ForegroundColor Red
+            $StatusCheck = cscript /nologo "${env:ProgramFiles}\Microsoft Office\Office21\ospp.vbs" /dstatus 2>$null
+            $LicenseStatus = ($StatusCheck | Select-String -Pattern "LICENSE STATUS:").ToString().Split(':')[-1].Trim()
+            if ($LicenseStatus -eq "LICENSED") { $Status = "ACTIVÉ ✅" }
+        } catch {}
+        Write-Host "  3️⃣ Office 2021        🔑 Statut: $Status" -ForegroundColor $(if ($Status -eq "ACTIVÉ ✅") { "Green" } else { "Yellow" })
+        $OfficeDetected += "2021"
     }
     
     $Office2024Path = "${env:ProgramFiles}\Microsoft Office\Office24"
     $Office2024Pathx86 = "${env:ProgramFiles(x86)}\Microsoft Office\Office24"
     
     if (Test-Path $Office2024Path -or Test-Path $Office2024Pathx86) {
-        Write-Host "   ✅ Office 2024 : Installé" -ForegroundColor Green
+        $Status = "Non activé"
         try {
-            $Status = cscript /nologo "${env:ProgramFiles}\Microsoft Office\Office24\ospp.vbs" /dstatus 2>$null
-            $LicenseStatus = ($Status | Select-String -Pattern "LICENSE STATUS:").ToString().Split(':')[-1].Trim()
-            if ($LicenseStatus -eq "LICENSED") {
-                Write-Host "      🔑 Statut: ACTIVÉ ✅" -ForegroundColor Green
-            } else {
-                Write-Host "      🔑 Statut: Non activé" -ForegroundColor Yellow
-            }
-        } catch {
-            Write-Host "      🔑 Statut: Inconnu" -ForegroundColor Yellow
-        }
-    } else {
-        Write-Host "   ❌ Office 2024 : Non installé" -ForegroundColor Red
+            $StatusCheck = cscript /nologo "${env:ProgramFiles}\Microsoft Office\Office24\ospp.vbs" /dstatus 2>$null
+            $LicenseStatus = ($StatusCheck | Select-String -Pattern "LICENSE STATUS:").ToString().Split(':')[-1].Trim()
+            if ($LicenseStatus -eq "LICENSED") { $Status = "ACTIVÉ ✅" }
+        } catch {}
+        Write-Host "  4️⃣ Office 2024        🔑 Statut: $Status" -ForegroundColor $(if ($Status -eq "ACTIVÉ ✅") { "Green" } else { "Yellow" })
+        $OfficeDetected += "2024"
+    }
+    
+    if ($OfficeDetected.Count -eq 0) {
+        Write-Host "  ❌ Aucune version Office détectée" -ForegroundColor Red
     }
 
     Write-Host ""
-    Write-Host "╔═══════════════════════════════════════════════════════════════╗" -ForegroundColor Cyan
-    Write-Host "║  📌 SÉLECTIONNEZ LA VERSION À ACTIVER                      ║" -ForegroundColor Cyan
-    Write-Host "╠═══════════════════════════════════════════════════════════════╣" -ForegroundColor Cyan
+    Write-Host "├─────────────────────────────────────────────────────────────────────┤" -ForegroundColor Cyan
+    Write-Host "│                                                                      │"
     
     $i = 1
-    
-    if (Test-Path $Office2016Path -or Test-Path $Office2016Pathx86) {
-        Write-Host "║  [$i] Microsoft Office 2016" -ForegroundColor White
+    foreach ($Version in $OfficeDetected) {
+        Write-Host "│  [$i] Activer Office $Version" -ForegroundColor White
         $i++
     }
     
-    if (Test-Path $Office2019Path -or Test-Path $Office2019Pathx86) {
-        Write-Host "║  [$i] Microsoft Office 2019" -ForegroundColor White
-        $i++
+    if ($OfficeDetected.Count -gt 1) {
+        Write-Host "│  [$i] Activer TOUTES les versions détectées" -ForegroundColor Green
     }
     
-    if (Test-Path $Office2021Path -or Test-Path $Office2021Pathx86) {
-        Write-Host "║  [$i] Microsoft Office 2021" -ForegroundColor White
-        $i++
-    }
-    
-    if (Test-Path $Office2024Path -or Test-Path $Office2024Pathx86) {
-        Write-Host "║  [$i] Microsoft Office 2024" -ForegroundColor White
-        $i++
-    }
-    
-    Write-Host "║  [A] Toutes les versions détectées" -ForegroundColor Yellow
-    Write-Host "║  [0] Retour au menu principal" -ForegroundColor Yellow
-    Write-Host "╠═══════════════════════════════════════════════════════════════╣" -ForegroundColor Cyan
-    Write-Host "║  ⚙️ OPTIONS:" -ForegroundColor Cyan
-    Write-Host "║  [W] Activer Windows également" -ForegroundColor White
-    Write-Host "║  [V] Activer Visio également" -ForegroundColor White
-    Write-Host "║  [P] Activer Project également" -ForegroundColor White
-    Write-Host "╚═══════════════════════════════════════════════════════════════╝" -ForegroundColor Cyan
+    Write-Host "│                                                                      │"
+    Write-Host "│  [0] Retour au menu principal                                       │"
+    Write-Host "│                                                                      │"
+    Write-Host "└─────────────────────────────────────────────────────────────────────┘" -ForegroundColor Cyan
     
     Write-Host ""
-    Write-Host "📝 Exemple: '2' pour Office 2019, '2 W' pour Office 2019 + Windows" -ForegroundColor DarkGray
-    Write-Host ""
-    
     $Choice = Read-Host "👉 Votre choix"
     
-    $Parts = $Choice.Split(' ')
-    $VersionChoice = $Parts[0]
-    $ExtraOptions = $Parts[1..$Parts.Length]
+    if ($Choice -eq "0") { return }
     
-    $ActivateWindows = $ExtraOptions -contains 'W'
-    $ActivateVisio = $ExtraOptions -contains 'V'
-    $ActivateProject = $ExtraOptions -contains 'P'
-    
-    $VersionIndex = 1
-    $VersionMap = @{}
-    
-    if (Test-Path $Office2016Path -or Test-Path $Office2016Pathx86) {
-        $VersionMap[$VersionIndex] = @{
-            Name = "Office 2016"
-            Param = @{}
-        }
-        $VersionIndex++
+    # Exécuter l'activation
+    $VersionMap = @{
+        "1" = "2016"
+        "2" = "2019"
+        "3" = "2021"
+        "4" = "2024"
     }
     
-    if (Test-Path $Office2019Path -or Test-Path $Office2019Pathx86) {
-        $VersionMap[$VersionIndex] = @{
-            Name = "Office 2019"
-            Param = @{}
-        }
-        $VersionIndex++
-    }
-    
-    if (Test-Path $Office2021Path -or Test-Path $Office2021Pathx86) {
-        $VersionMap[$VersionIndex] = @{
-            Name = "Office 2021"
-            Param = @{}
-        }
-        $VersionIndex++
-    }
-    
-    if (Test-Path $Office2024Path -or Test-Path $Office2024Pathx86) {
-        $VersionMap[$VersionIndex] = @{
-            Name = "Office 2024"
-            Param = @{
-                Office2024 = $true
-            }
-        }
-        $VersionIndex++
-    }
-    
-    $Command = "J4-Activator"
-    
-    if ($VersionChoice -eq 'A') {
+    if ($Choice -match '^\d+$' -and [int]$Choice -le $OfficeDetected.Count) {
+        $Version = $VersionMap[$Choice]
+        $Params = @{}
+        if ($Version -eq "2024") { $Params['Office2024'] = $true }
         Write-Host ""
-        Write-Host "🚀 Activation de TOUTES les versions détectées..." -ForegroundColor Yellow
-        
-        foreach ($Key in $VersionMap.Keys) {
-            $VersionInfo = $VersionMap[$Key]
-            $Params = $VersionInfo.Param
-            
-            if ($ActivateWindows) { $Params['ActivateWindows'] = $true }
-            if ($ActivateVisio) { $Params['ActivateVisio'] = $true }
-            if ($ActivateProject) { $Params['ActivateProject'] = $true }
-            
-            $ParamString = ''
-            foreach ($P in $Params.Keys) {
-                $ParamString += " -$P"
-            }
-            Invoke-Expression "$Command$ParamString"
+        Write-Host "🚀 Activation de Office $Version..." -ForegroundColor Yellow
+        J4-Activator @Params
+    } elseif ($Choice -eq $OfficeDetected.Count + 1 -and $OfficeDetected.Count -gt 1) {
+        Write-Host ""
+        Write-Host "🚀 Activation de TOUTES les versions Office..." -ForegroundColor Yellow
+        foreach ($Version in $OfficeDetected) {
+            $Params = @{}
+            if ($Version -eq "2024") { $Params['Office2024'] = $true }
+            J4-Activator @Params
         }
-        
-        Write-Host ""
-        Write-Host "✅ Activation terminée pour toutes les versions!" -ForegroundColor Green
-        
-    } elseif ($VersionChoice -match '^\d+$' -and $VersionMap.ContainsKey([int]$VersionChoice)) {
-        $VersionInfo = $VersionMap[[int]$VersionChoice]
-        $Params = $VersionInfo.Param
-        
-        Write-Host ""
-        Write-Host "🚀 Activation de $($VersionInfo.Name)..." -ForegroundColor Yellow
-        
-        if ($ActivateWindows) { $Params['ActivateWindows'] = $true }
-        if ($ActivateVisio) { $Params['ActivateVisio'] = $true }
-        if ($ActivateProject) { $Params['ActivateProject'] = $true }
-        
-        $ParamString = ''
-        foreach ($P in $Params.Keys) {
-            $ParamString += " -$P"
-        }
-        Invoke-Expression "$Command$ParamString"
-        
-        Write-Host ""
-        Write-Host "✅ Activation terminée!" -ForegroundColor Green
-        
     } else {
         Write-Host "❌ Option invalide" -ForegroundColor Red
+        Start-Sleep -Seconds 1
     }
     
     Write-Host ""
     Read-Host "Appuyez sur Entrée pour continuer..."
 }
 
+# ===== SOUS-MENU 2 : WINDOWS =====
+
+function Show-WindowsMenu {
+    Clear-Host
+    
+    Write-Host @"
+┌─────────────────────────────────────────────────────────────────────┐
+│  🪟 ACTIVATION WINDOWS                                             │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  📋 VERSIONS WINDOWS DÉTECTÉES:                                     │
+│                                                                      │
+"@ -ForegroundColor Cyan
+
+    try {
+        $WindowsVersion = (Get-WmiObject -Class Win32_OperatingSystem).Caption
+        Write-Host "  ✅ Version détectée: $WindowsVersion" -ForegroundColor Green
+        
+        # Vérifier le statut
+        $Status = "Non activé"
+        try {
+            $StatusCheck = slmgr.vbs /dli 2>$null
+            if ($StatusCheck -match "LICENSED") { $Status = "ACTIVÉ ✅" }
+        } catch {}
+        Write-Host "  🔑 Statut: $Status" -ForegroundColor $(if ($Status -eq "ACTIVÉ ✅") { "Green" } else { "Yellow" })
+    } catch {
+        Write-Host "  ❌ Impossible de détecter Windows" -ForegroundColor Red
+    }
+
+    Write-Host ""
+    Write-Host "├─────────────────────────────────────────────────────────────────────┤" -ForegroundColor Cyan
+    Write-Host "│                                                                      │"
+    Write-Host "│  [1] Activer Windows automatiquement (version détectée)            │" -ForegroundColor Green
+    Write-Host "│                                                                      │"
+    Write-Host "│  [0] Retour au menu principal                                       │"
+    Write-Host "│                                                                      │"
+    Write-Host "└─────────────────────────────────────────────────────────────────────┘" -ForegroundColor Cyan
+    
+    Write-Host ""
+    $Choice = Read-Host "👉 Votre choix"
+    
+    if ($Choice -eq "1") {
+        Write-Host ""
+        Write-Host "🚀 Activation de Windows..." -ForegroundColor Yellow
+        J4-Activator -ActivateWindows
+        Write-Host ""
+        Read-Host "Appuyez sur Entrée pour continuer..."
+    }
+}
+
+# ===== SOUS-MENU 3 : VISIO =====
+
+function Show-VisioMenu {
+    Clear-Host
+    
+    Write-Host @"
+┌─────────────────────────────────────────────────────────────────────┐
+│  💎 ACTIVATION VISIO                                               │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  📋 VERSIONS VISIO DÉTECTÉES:                                       │
+│                                                                      │
+"@ -ForegroundColor Cyan
+
+    $VisioDetected = @()
+    
+    $VisioPath = "${env:ProgramFiles}\Microsoft Office\Office16\visio.exe"
+    $VisioPathx86 = "${env:ProgramFiles(x86)}\Microsoft Office\Office16\visio.exe"
+    
+    if (Test-Path $VisioPath -or Test-Path $VisioPathx86) {
+        Write-Host "  ✅ Visio détecté" -ForegroundColor Green
+        $VisioDetected += "Visio"
+    } else {
+        Write-Host "  ❌ Visio non détecté" -ForegroundColor Red
+    }
+
+    Write-Host ""
+    Write-Host "├─────────────────────────────────────────────────────────────────────┤" -ForegroundColor Cyan
+    Write-Host "│                                                                      │"
+    
+    if ($VisioDetected.Count -gt 0) {
+        Write-Host "│  [1] Activer Visio" -ForegroundColor Green
+    }
+    Write-Host "│                                                                      │"
+    Write-Host "│  [0] Retour au menu principal                                       │"
+    Write-Host "│                                                                      │"
+    Write-Host "└─────────────────────────────────────────────────────────────────────┘" -ForegroundColor Cyan
+    
+    Write-Host ""
+    $Choice = Read-Host "👉 Votre choix"
+    
+    if ($Choice -eq "1" -and $VisioDetected.Count -gt 0) {
+        Write-Host ""
+        Write-Host "🚀 Activation de Visio..." -ForegroundColor Yellow
+        J4-Activator -ActivateVisio
+        Write-Host ""
+        Read-Host "Appuyez sur Entrée pour continuer..."
+    }
+}
+
+# ===== SOUS-MENU 4 : PROJECT =====
+
+function Show-ProjectMenu {
+    Clear-Host
+    
+    Write-Host @"
+┌─────────────────────────────────────────────────────────────────────┐
+│  📊 ACTIVATION PROJECT                                             │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  📋 VERSIONS PROJECT DÉTECTÉES:                                     │
+│                                                                      │
+"@ -ForegroundColor Cyan
+
+    $ProjectDetected = @()
+    
+    $ProjectPath = "${env:ProgramFiles}\Microsoft Office\Office16\winproj.exe"
+    $ProjectPathx86 = "${env:ProgramFiles(x86)}\Microsoft Office\Office16\winproj.exe"
+    
+    if (Test-Path $ProjectPath -or Test-Path $ProjectPathx86) {
+        Write-Host "  ✅ Project détecté" -ForegroundColor Green
+        $ProjectDetected += "Project"
+    } else {
+        Write-Host "  ❌ Project non détecté" -ForegroundColor Red
+    }
+
+    Write-Host ""
+    Write-Host "├─────────────────────────────────────────────────────────────────────┤" -ForegroundColor Cyan
+    Write-Host "│                                                                      │"
+    
+    if ($ProjectDetected.Count -gt 0) {
+        Write-Host "│  [1] Activer Project" -ForegroundColor Green
+    }
+    Write-Host "│                                                                      │"
+    Write-Host "│  [0] Retour au menu principal                                       │"
+    Write-Host "│                                                                      │"
+    Write-Host "└─────────────────────────────────────────────────────────────────────┘" -ForegroundColor Cyan
+    
+    Write-Host ""
+    $Choice = Read-Host "👉 Votre choix"
+    
+    if ($Choice -eq "1" -and $ProjectDetected.Count -gt 0) {
+        Write-Host ""
+        Write-Host "🚀 Activation de Project..." -ForegroundColor Yellow
+        J4-Activator -ActivateProject
+        Write-Host ""
+        Read-Host "Appuyez sur Entrée pour continuer..."
+    }
+}
+
+# ===== SOUS-MENU 5 : TOUT =====
+
+function Show-AllMenu {
+    Clear-Host
+    
+    Write-Host @"
+┌─────────────────────────────────────────────────────────────────────┐
+│  🚀 ACTIVATION COMPLÈTE (Office + Windows + Visio + Project)      │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  ⚠️ Cette option va activer TOUT ce qui est détecté               │
+│                                                                      │
+│  ✅ Office (toutes les versions installées)                         │
+│  ✅ Windows (version détectée)                                      │
+│  ✅ Visio (si installé)                                             │
+│  ✅ Project (si installé)                                           │
+│                                                                      │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  [1] Activer TOUT                                                  │
+│                                                                      │
+│  [0] Retour au menu principal                                       │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+"@ -ForegroundColor Cyan
+    
+    Write-Host ""
+    $Choice = Read-Host "👉 Votre choix"
+    
+    if ($Choice -eq "1") {
+        Write-Host ""
+        Write-Host "🚀 Activation de TOUT..." -ForegroundColor Yellow
+        J4-Activator -ActivateWindows -ActivateVisio -ActivateProject
+        Write-Host ""
+        Read-Host "Appuyez sur Entrée pour continuer..."
+    }
+}
+
+# ===== SOUS-MENU 6 : SERVEURS KMS =====
+
 function Show-KMSServerMenu {
     Clear-Host
-    Write-Host "📡 SÉLECTION DU SERVEUR KMS" -ForegroundColor Cyan
     
+    Write-Host @"
+┌─────────────────────────────────────────────────────────────────────┐
+│  📡 SÉLECTION DU SERVEUR KMS                                       │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  📋 SERVEURS DISPONIBLES:                                           │
+│                                                                      │
+"@ -ForegroundColor Cyan
+
     $KMS_Servers = @(
         'e8.us.to',
         'e9.us.to',
@@ -892,51 +1043,99 @@ function Show-KMSServerMenu {
     )
     
     $i = 1
-    Write-Host ""
-    Write-Host "📋 SERVEURS DISPONIBLES:" -ForegroundColor Yellow
     foreach ($Server in $KMS_Servers) {
-        $Test = Test-NetConnection -ComputerName $Server -Port 1688 -WarningAction SilentlyContinue -ErrorAction SilentlyContinue
-        if ($Test.TcpTestSucceeded) {
-            Write-Host "   $i. $Server ✅" -ForegroundColor Green
+        $Test = Test-KMSServer -Server $Server -Port 1688
+        if ($Test) {
+            Write-Host "  $i. $Server ✅" -ForegroundColor Green
         } else {
-            Write-Host "   $i. $Server ❌" -ForegroundColor Red
+            Write-Host "  $i. $Server ❌" -ForegroundColor Red
         }
         $i++
     }
+
+    Write-Host ""
+    Write-Host "├─────────────────────────────────────────────────────────────────────┤" -ForegroundColor Cyan
+    Write-Host "│                                                                      │"
+    Write-Host "│  [A] 🔍 Sélection automatique                                      │"
+    Write-Host "│  [M] 📝 Entrer un serveur manuellement                             │"
+    Write-Host "│                                                                      │"
+    Write-Host "│  [0] Retour au menu principal                                       │"
+    Write-Host "│                                                                      │"
+    Write-Host "└─────────────────────────────────────────────────────────────────────┘" -ForegroundColor Cyan
     
     Write-Host ""
-    $ChoiceServer = Read-Host "Sélectionnez un serveur (1-$($KMS_Servers.Count)) ou 0 pour auto"
+    $Choice = Read-Host "👉 Votre choix"
     
-    if ($ChoiceServer -ne "0" -and $ChoiceServer -ge 1 -and $ChoiceServer -le $KMS_Servers.Count) {
-        $SelectedServer = $KMS_Servers[$ChoiceServer - 1]
-        Write-Host "✅ Serveur sélectionné: $SelectedServer" -ForegroundColor Green
-        $GLOBAL:KMS_Server = $SelectedServer
-    } else {
-        Write-Host "🔍 Utilisation de la sélection automatique" -ForegroundColor Yellow
-        $GLOBAL:KMS_Server = $null
+    if ($Choice -eq "A" -or $Choice -eq "a") {
+        Write-Host "🔍 Recherche automatique d'un serveur KMS..." -ForegroundColor Yellow
+        $Server = Find-KMSServer
+        if ($Server) {
+            Write-Host "✅ Serveur sélectionné: $Server" -ForegroundColor Green
+        }
+        Write-Host ""
+        Read-Host "Appuyez sur Entrée pour continuer..."
+    } elseif ($Choice -eq "M" -or $Choice -eq "m") {
+        $ManualServer = Read-Host "📝 Entrez l'adresse du serveur KMS"
+        if ($ManualServer) {
+            Write-Host "✅ Serveur sélectionné: $ManualServer" -ForegroundColor Green
+        }
+        Write-Host ""
+        Read-Host "Appuyez sur Entrée pour continuer..."
     }
-    
-    Write-Host ""
-    Read-Host "Appuyez sur Entrée pour continuer..."
 }
+
+# ===== SOUS-MENU 7 : PARAMÈTRES AVANCÉS =====
 
 function Show-AdvancedSettings {
     Clear-Host
-    Write-Host "⚙️ PARAMÈTRES AVANCÉS" -ForegroundColor Cyan
+    
+    Write-Host @"
+┌─────────────────────────────────────────────────────────────────────┐
+│  ⚙️ PARAMÈTRES AVANCÉS                                             │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  📋 ÉTAT ACTUEL:                                                    │
+│                                                                      │
+│  1️⃣ Mode silencieux : ❌ Désactivé                                 │
+│  2️⃣ Logging : ❌ Désactivé                                         │
+│  3️⃣ Rollback : ✅ Activé                                           │
+│  4️⃣ Serveur KMS : 🔍 Automatique                                  │
+│                                                                      │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  [1] Activer/Désactiver le mode silencieux                         │
+│  [2] Activer/Désactiver le logging                                  │
+│  [3] Activer/Désactiver le rollback                                 │
+│  [4] Changer le serveur KMS                                         │
+│                                                                      │
+│  [0] Retour au menu principal                                       │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+"@ -ForegroundColor Cyan
     
     Write-Host ""
-    Write-Host "📋 OPTIONS:" -ForegroundColor Yellow
-    Write-Host "   1. Mode silencieux (pas de sortie)" -ForegroundColor White
-    Write-Host "   2. Générer un log d'activation" -ForegroundColor White
-    Write-Host "   3. Désactiver le rollback" -ForegroundColor White
-    Write-Host "   0. Retour" -ForegroundColor White
-    
     $Choice = Read-Host "👉 Votre choix"
     
     switch ($Choice) {
-        '1' { $GLOBAL:Silent = $true; Write-Host "🔇 Mode silencieux activé" -ForegroundColor Green }
-        '2' { $GLOBAL:Log = $true; Write-Host "📝 Logging activé" -ForegroundColor Green }
-        '3' { $GLOBAL:DontRollback = $true; Write-Host "⏭️ Rollback désactivé" -ForegroundColor Green }
+        '1' { 
+            $GLOBAL:Silent = !$GLOBAL:Silent
+            Write-Host "🔇 Mode silencieux: $(if ($GLOBAL:Silent) { 'ACTIVÉ ✅' } else { 'DÉSACTIVÉ ❌' })" -ForegroundColor $(if ($GLOBAL:Silent) { 'Green' } else { 'Red' })
+        }
+        '2' { 
+            $GLOBAL:Log = !$GLOBAL:Log
+            Write-Host "📝 Logging: $(if ($GLOBAL:Log) { 'ACTIVÉ ✅' } else { 'DÉSACTIVÉ ❌' })" -ForegroundColor $(if ($GLOBAL:Log) { 'Green' } else { 'Red' })
+        }
+        '3' { 
+            $GLOBAL:DontRollback = !$GLOBAL:DontRollback
+            Write-Host "⏭️ Rollback: $(if ($GLOBAL:DontRollback) { 'DÉSACTIVÉ ❌' } else { 'ACTIVÉ ✅' })" -ForegroundColor $(if (!$GLOBAL:DontRollback) { 'Green' } else { 'Red' })
+        }
+        '4' { 
+            $ManualServer = Read-Host "📝 Entrez l'adresse du serveur KMS"
+            if ($ManualServer) {
+                $GLOBAL:KMS_Server = $ManualServer
+                Write-Host "✅ Serveur configuré: $ManualServer" -ForegroundColor Green
+            }
+        }
         '0' { return }
         default { Write-Host "❌ Option invalide" -ForegroundColor Red }
     }
@@ -944,6 +1143,8 @@ function Show-AdvancedSettings {
     Write-Host ""
     Read-Host "Appuyez sur Entrée pour continuer..."
 }
+
+# ===== SOUS-MENU 8 : INFORMATIONS SYSTÈME =====
 
 function Show-SystemInfo {
     Clear-Host
@@ -1000,6 +1201,8 @@ function Show-SystemInfo {
     Read-Host "Appuyez sur Entrée pour continuer..."
 }
 
+# ===== SOUS-MENU 9 : RÉPARATION =====
+
 function Repair-Office {
     Clear-Host
     Write-Host "🔧 RÉPARATION OFFICE" -ForegroundColor Cyan
@@ -1039,68 +1242,16 @@ function Repair-Office {
     Read-Host "Appuyez sur Entrée pour continuer..."
 }
 
-function Show-MainMenu {
-    Clear-Host
-    
-    Write-Host @"
-╔══════════════════════════════════════════════════════════════════════╗
-║                                                                      ║
-║   ██╗  ██╗    █████╗  ██████╗████████╗██╗██╗   ██╗ █████╗ ████████╗║
-║   ██║  ██║   ██╔══██╗██╔════╝╚══██╔══╝██║██║   ██║██╔══██╗╚══██╔══╝║
-║   ███████║   ███████║██║        ██║   ██║██║   ██║███████║   ██║   ║
-║   ╚════██║   ██╔══██║██║        ██║   ██║╚██╗ ██╔╝██╔══██║   ██║   ║
-║        ██║   ██║  ██║╚██████╗   ██║   ██║ ╚████╔╝ ██║  ██║   ██║   ║
-║        ╚═╝   ╚═╝  ╚═╝ ╚═════╝   ╚═╝   ╚═╝  ╚═══╝  ╚═╝  ╚═╝   ╚═╝   ║
-║                                                                      ║
-║              J4 ACTIVATOR - ULTIMATE EDITION                        ║
-║              JATHNIEL EDITION - v3.0                                ║
-║                                                                      ║
-╚══════════════════════════════════════════════════════════════════════╝
-"@ -ForegroundColor Cyan
-
-    Write-Host ""
-    Write-Host "┌─────────────────────────────────────────────────────────────┐" -ForegroundColor Cyan
-    Write-Host "│  MENU PRINCIPAL                                            │" -ForegroundColor Cyan
-    Write-Host "├─────────────────────────────────────────────────────────────┤" -ForegroundColor Cyan
-    Write-Host "│  [1] 🔥 Activer Office (Sélection des versions)            │" -ForegroundColor White
-    Write-Host "│  [2] 📡 Choisir un serveur KMS                             │" -ForegroundColor White
-    Write-Host "│  [3] ⚙️ Paramètres avancés                                 │" -ForegroundColor White
-    Write-Host "│  [4] ℹ️ Informations système                               │" -ForegroundColor White
-    Write-Host "│  [5] 🔧 Réparer Office                                     │" -ForegroundColor White
-    Write-Host "│  [0] ❌ Quitter                                            │" -ForegroundColor White
-    Write-Host "└─────────────────────────────────────────────────────────────┘" -ForegroundColor Cyan
-    
-    Write-Host ""
-    $Choice = Read-Host "👉 Votre choix"
-    
-    switch ($Choice) {
-        '1' { Show-OfficeVersionMenu }
-        '2' { Show-KMSServerMenu }
-        '3' { Show-AdvancedSettings }
-        '4' { Show-SystemInfo }
-        '5' { Repair-Office }
-        '0' {
-            Clear-Host
-            Write-Host "👋 Au revoir!" -ForegroundColor Green
-            exit
-        }
-        default {
-            Write-Host "❌ Option invalide" -ForegroundColor Red
-            Start-Sleep -Seconds 1
-        }
-    }
-}
-
 # ==================== LANCEMENT ====================
-
-# Installer les dépendances au démarrage
-Install-Dependencies
 
 # Variables globales
 $GLOBAL:Silent = $false
 $GLOBAL:Log = $false
 $GLOBAL:DontRollback = $false
 $GLOBAL:KMS_Server = $null
+
+# Installer les dépendances au démarrage
+Install-Dependencies
 
 # Afficher un message de bienvenue
 Clear-Host
