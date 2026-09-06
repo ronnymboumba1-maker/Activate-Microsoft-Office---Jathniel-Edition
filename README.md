@@ -8,7 +8,7 @@ Version 3.0.0 - JATHNIEL EDITION
 
 ---
 
-📖 PRÉSENTATION GÉNÉRALE
+## 📖 PRÉSENTATION GÉNÉRALE ##
 
 J4 Activator est un outil d'activation KMS complet et interactif pour l'écosystème Microsoft. Il permet d'activer Microsoft Office, Windows, Visio et Project en quelques clics, grâce à une interface intuitive et des serveurs KMS publics.
 
@@ -16,7 +16,7 @@ Conçu pour être simple d'utilisation, il détecte automatiquement les versions
 
 ---
 
-✨ FONCTIONNALITÉS PRINCIPALES
+## ✨ FONCTIONNALITÉS PRINCIPALES ##
 
 Fonctionnalité Description
 Activation Office Support Office 2016, 2019, 2021, 2024
@@ -34,7 +34,7 @@ Auto-installation Installe les dépendances automatiquement
 
 ---
 
-🖥️ MENU PRINCIPAL
+## 🖥️ MENU PRINCIPAL ##
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
