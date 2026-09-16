@@ -1,4 +1,3 @@
-Oui. Je te le mets **en un seul bloc**, sans texte autour, pour un copier-coller direct dans ton fichier `.md` :
 
 ````markdown
 # J4 ACTIVATOR - JATHNIEL EDITION v3.1.0
